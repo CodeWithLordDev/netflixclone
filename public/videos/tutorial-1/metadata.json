@@ -1,0 +1,34 @@
+[
+  {
+    "videoId": "Reptile_Curssor",
+    "title": "Web Development Cursor Complete Guide",
+    "description": "Learn full-stack web development from scratch - HTML, CSS, JavaScript, React, Node.js and MongoDB",
+    "genre": "Tutorial",
+    "rating": 9.5,
+    "duration": 780
+  },
+  {
+    "videoId": "5_Ways_to_use_AI_in_Coding_Copy_these_480P",
+    "title": "5 Ways to use AI in Coding - Copy these 480P",
+    "description": "Learn 5 practical ways to use AI in your coding workflow - from code completion to debugging assistance",
+    "genre": "Tutorial",
+    "rating": 9.2,
+    "duration": 1200
+  },
+  {
+    "videoId": "End_of_Web_Development_360P",
+    "title": "End Of Web Development Course",
+    "description": "Master MongoDB indexing, aggregation pipelines, and query optimization techniques for production-grade applications",
+    "genre": "Tutorial",
+    "rating": 8.8,
+    "duration": 950
+  },
+  {
+    "videoId": "Google_Antigravity",
+    "title": "Google Antigravity by Codewithharry",
+    "description": "Master MongoDB indexing, aggregation pipelines, and query optimization techniques for production-grade applications",
+    "genre": "Tutorial",
+    "rating": 8.8,
+    "duration": 950
+  }
+]
