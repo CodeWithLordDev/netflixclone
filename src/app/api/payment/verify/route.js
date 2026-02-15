@@ -73,7 +73,7 @@ export async function POST(req) {
     }
 
     // 🔐 CREATE NEW JWT - Pass entire user object
-    const newToken = signToken(updatedUser);
+    const newToken = signToken(updatedUser, { deviceId: userData.deviceId });
 
     const res = NextResponse.json({
       message: "Payment verified & subscription activated",

@@ -27,17 +27,17 @@ const VIDEOS_FOLDER = path.join(__dirname, 'public', 'videos');
 
 async function seedVideos() {
   try {
-    console.log('🚀 Starting video seeding...');
+    // console.log('🚀 Starting video seeding...');
     
     // Connect to database
     await connectDB();
-    console.log('✅ Connected to database');
+    // console.log('✅ Connected to database');
 
     // Check if videos folder exists
     if (!fs.existsSync(VIDEOS_FOLDER)) {
-      console.log('📁 Videos folder does not exist yet. Creating structure...');
+      // console.log('📁 Videos folder does not exist yet. Creating structure...');
       fs.mkdirSync(VIDEOS_FOLDER, { recursive: true });
-      console.log(`📁 Created: ${VIDEOS_FOLDER}`);
+      // console.log(`📁 Created: ${VIDEOS_FOLDER}`);
       return;
     }
 
@@ -45,10 +45,10 @@ async function seedVideos() {
     const videoFolders = fs.readdirSync(VIDEOS_FOLDER);
     
     if (videoFolders.length === 0) {
-      console.log('📭 No videos found in public/videos folder');
-      console.log('📖 Please add video folders with this structure:');
-      console.log('   public/videos/video1/video.mp4');
-      console.log('   public/videos/video1/thumbnail.jpg');
+      // console.log('📭 No videos found in public/videos folder');
+      // console.log('📖 Please add video folders with this structure:');
+      // console.log('   public/videos/video1/video.mp4');
+      // console.log('   public/videos/video1/thumbnail.jpg');
       return;
     }
 
@@ -69,7 +69,7 @@ async function seedVideos() {
       );
 
       if (videoFiles.length === 0) {
-        console.log(`⚠️  Skipped "${folderName}": No video file found`);
+        // console.log(`⚠️  Skipped "${folderName}": No video file found`);
         skippedCount++;
         continue;
       }
@@ -101,7 +101,7 @@ async function seedVideos() {
       // Check if video already exists
       const existingVideo = await CustomVideo.findOne({ videoId });
       if (existingVideo) {
-        console.log(`⏭️  Skipped "${folderName}": Already exists (videoId: ${videoId})`);
+        // console.log(`⏭️  Skipped "${folderName}": Already exists (videoId: ${videoId})`);
         skippedCount++;
         continue;
       }
@@ -125,14 +125,14 @@ async function seedVideos() {
       });
 
       await videoDoc.save();
-      console.log(`✅ Added: "${videoDoc.title}" (${videoFile})`);
+      // console.log(`✅ Added: "${videoDoc.title}" (${videoFile})`);
       processedCount++;
     }
 
-    console.log('\n📊 Seeding Summary:');
-    console.log(`   ✅ Processed: ${processedCount}`);
-    console.log(`   ⏭️  Skipped: ${skippedCount}`);
-    console.log('🎉 Video seeding complete!');
+    // console.log('\n📊 Seeding Summary:');
+    // console.log(`   ✅ Processed: ${processedCount}`);
+    // console.log(`   ⏭️  Skipped: ${skippedCount}`);
+    // console.log('🎉 Video seeding complete!');
 
   } catch (error) {
     console.error('❌ Error during seeding:', error);

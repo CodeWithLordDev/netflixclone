@@ -36,12 +36,13 @@ const MovieRow = ({ title, movies, rowId, onMovieClick, myList, onAddToMyList, o
           className="flex overflow-x-scroll scrollbar-hide space-x-4 px-4 md:px-12 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {movies.map((movie) => {
+          {movies.map((movie, index) => {
             const movieId = movie.id || movie.videoId;
             const isInMyList = myList.some((m) => (m.id || m.videoId) === movieId);
+            const movieKey = `${movie.isCustom ? "custom" : "tmdb"}-${String(movieId)}-${index}`;
             return (
               <div
-                key={movieId}
+                key={movieKey}
                 className="flex-none w-40 md:w-48 lg:w-56 group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
               >
                 <img
@@ -78,7 +79,7 @@ const MovieRow = ({ title, movies, rowId, onMovieClick, myList, onAddToMyList, o
                     onClick={(e) => {
                       e.stopPropagation();
                       isInMyList
-                        ? onRemoveFromMyList(movie.id)
+                        ? onRemoveFromMyList(movie.id || movie.videoId)
                         : onAddToMyList(movie);
                     }}
                     className={`px-4 py-2 rounded font-semibold text-sm transition ${
@@ -115,12 +116,13 @@ const MovieGrid = ({ title, movies, gridId, onMovieClick, myList, onAddToMyList,
       id={gridId}
       className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 px-4 md:px-12"
     >
-      {movies.map((movie) => {
+      {movies.map((movie, index) => {
         const movieId = movie.id || movie.videoId;
         const isInMyList = myList.some((m) => (m.id || m.videoId) === movieId);
+        const movieKey = `${movie.isCustom ? "custom" : "tmdb"}-${String(movieId)}-${index}`;
         return (
           <div
-            key={movieId}
+            key={movieKey}
             className="group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
           >
             <img
@@ -156,7 +158,9 @@ const MovieGrid = ({ title, movies, gridId, onMovieClick, myList, onAddToMyList,
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  isInMyList ? onRemoveFromMyList(movie.id) : onAddToMyList(movie);
+                  isInMyList
+                    ? onRemoveFromMyList(movie.id || movie.videoId)
+                    : onAddToMyList(movie);
                 }}
                 className={`px-3 py-2 rounded font-semibold text-xs transition ${
                   isInMyList
@@ -263,7 +267,7 @@ const [pendingVideo, setPendingVideo] = useState(null);
 
   const loadInitialData = async () => {
     setLoading(true);
-    console.log("🚀 Starting loadInitialData...");
+    // console.log("🚀 Starting loadInitialData...");
     const [popularMovies, trendingMovies, topRatedMovies, upcomingMovies, customVids] =
       await Promise.all([
         fetchMovies("/movie/popular"),
@@ -273,13 +277,13 @@ const [pendingVideo, setPendingVideo] = useState(null);
         fetchCustomVideos(),
       ]);
 
-    console.log("📊 Data loaded:");
-    console.log("  - Popular:", popularMovies.length);
-    console.log("  - Trending:", trendingMovies.length);
-    console.log("  - Top Rated:", topRatedMovies.length);
-    console.log("  - Upcoming:", upcomingMovies.length);
-    console.log("  - Custom Videos:", customVids ? customVids.length : 0);
-    console.log("  - Custom Videos Array:", customVids);
+    // console.log("📊 Data loaded:");
+    // console.log("  - Popular:", popularMovies.length);
+    // console.log("  - Trending:", trendingMovies.length);
+    // console.log("  - Top Rated:", topRatedMovies.length);
+    // console.log("  - Upcoming:", upcomingMovies.length);
+    // console.log("  - Custom Videos:", customVids ? customVids.length : 0);
+    // console.log("  - Custom Videos Array:", customVids);
     
     setMovies(popularMovies);
     setTrending(trendingMovies);
@@ -296,16 +300,16 @@ const [pendingVideo, setPendingVideo] = useState(null);
   const fetchCustomVideos = async () => {
     try {
       const response = await fetch("/api/custom-videos");
-      console.log("API Response status:", response.status);
+      // console.log("API Response status:", response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log("✅ Fetched custom videos - Raw data:", data);
-        console.log("✅ Is array:", Array.isArray(data));
-        console.log("✅ Length:", Array.isArray(data) ? data.length : "Not an array");
+        // console.log("✅ Fetched custom videos - Raw data:", data);
+        // console.log("✅ Is array:", Array.isArray(data));
+        // console.log("✅ Length:", Array.isArray(data) ? data.length : "Not an array");
         
         // Handle if data is an object with results property
         const videos = Array.isArray(data) ? data : (data.videos || data.results || []);
-        console.log("✅ Processed videos:", videos);
+        // console.log("✅ Processed videos:", videos);
         return videos;
       } else {
         console.error("API returned status:", response.status);
@@ -335,7 +339,7 @@ const [pendingVideo, setPendingVideo] = useState(null);
 
   const addToMyList = async (movie) => {
     try {
-      console.log("Adding movie to list:", movie);
+      // console.log("Adding movie to list:", movie);
       const response = await fetch("/api/movies/mylist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -344,14 +348,14 @@ const [pendingVideo, setPendingVideo] = useState(null);
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Updated myList after adding:", data.myList);
+        // console.log("Updated myList after adding:", data.myList);
         setMyList(data.myList || []);
         // If user is currently on mylist tab, also update movies display
         if (activeNav === "mylist") {
           setMovies(data.myList || []);
         }
       } else if (response.status === 409) {
-        console.log("Movie already in list");
+        // console.log("Movie already in list");
       }
     } catch (error) {
       console.error("Error adding to my list:", error);
@@ -360,7 +364,7 @@ const [pendingVideo, setPendingVideo] = useState(null);
 
   const removeFromMyList = async (movieId) => {
     try {
-      const response = await fetch(`/api/movies/mylist/${movieId}`, {
+      const response = await fetch(`/api/movies/mylist/${encodeURIComponent(movieId)}`, {
         method: "DELETE",
       });
 
@@ -450,7 +454,7 @@ const handleAdFinished = () => {
         if (response.ok) {
           const data = await response.json();
           const list = data.myList || [];
-          console.log("Loaded myList:", list);
+          // console.log("Loaded myList:", list);
           setMyList(list);
           setMovies(list);
           setTrending([]);
@@ -853,7 +857,14 @@ const handleAdFinished = () => {
         movie={selectedMovie}
         isOpen={showMovieDetail}
         onClose={handleCloseModal}
-        isInMyList={selectedMovie && myList.some((m) => m.id === selectedMovie.id)}
+        isInMyList={
+          selectedMovie &&
+          myList.some(
+            (m) =>
+              String(m.id ?? m.videoId) ===
+              String(selectedMovie.id ?? selectedMovie.videoId)
+          )
+        }
         onAddToMyList={addToMyList}
         onRemoveFromMyList={removeFromMyList}
         

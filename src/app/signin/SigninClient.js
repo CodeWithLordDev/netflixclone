@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { getOrCreateDeviceId } from "@/lib/deviceId";
 
 export default function SigninClient() {
   const router = useRouter();
@@ -51,10 +52,11 @@ export default function SigninClient() {
     setLoading(true);
 
     try {
+      const deviceId = getOrCreateDeviceId();
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, deviceId }),
       });
 
       const data = await res.json();
@@ -179,7 +181,7 @@ export default function SigninClient() {
           </div>
 
           <div className="mt-3 text-xs text-zinc-500">
-            This page is protected by Google reCAPTCHA to ensure you're not a bot.{" "}
+            This page is protected by Google reCAPTCHA to ensure you&apos;re not a bot.{" "}
             <a href="#" className="text-blue-600 hover:underline">
               Learn more
             </a>

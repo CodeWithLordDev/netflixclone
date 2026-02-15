@@ -21,9 +21,34 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    activeSessions: [
+      {
+        deviceId: {
+          type: String,
+          required: true,
+        },
+        userAgent: {
+          type: String,
+          default: "",
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+        lastSeenAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     myList: [
       {
-        id: Number,
+        id: mongoose.Schema.Types.Mixed,
+        videoId: String,
+        isCustom: {
+          type: Boolean,
+          default: false,
+        },
         title: String,
         backdrop_path: String,
         poster_path: String,

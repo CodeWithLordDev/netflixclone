@@ -62,7 +62,8 @@ export async function POST(req) {
     }
 
     const { movie } = await req.json();
-    if (!movie || !movie.id) {
+    const movieIdentifier = movie?.id ?? movie?.videoId;
+    if (!movie || movieIdentifier === undefined || movieIdentifier === null) {
       return NextResponse.json(
         { message: "Movie data is required" },
         { status: 400 }
@@ -85,7 +86,9 @@ export async function POST(req) {
     }
 
     // Check if movie already exists in list
-    const exists = user.myList.some((m) => m.id === movie.id);
+    const exists = user.myList.some(
+      (m) => String(m.id ?? m.videoId) === String(movieIdentifier)
+    );
     if (exists) {
       return NextResponse.json(
         { message: "Movie already in list" },
@@ -93,8 +96,17 @@ export async function POST(req) {
       );
     }
 
+    const normalizedMovie = {
+      ...movie,
+      id: movie.id ?? movieIdentifier,
+      videoId:
+        movie.videoId ??
+        (typeof movieIdentifier === "string" ? movieIdentifier : undefined),
+      isCustom: Boolean(movie.isCustom || movie.videoId || movie.videoUrl),
+    };
+
     // Add movie to list
-    user.myList.push(movie);
+    user.myList.push(normalizedMovie);
     await user.save();
 
     return NextResponse.json({

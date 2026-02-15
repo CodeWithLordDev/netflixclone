@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import { verifyToken } from "@/lib/jwt";
 
-export async function DELETE(req, { params }) {
+export async function DELETE(req, context) {
   try {
     const token = req.cookies.get("token")?.value;
     if (!token) {
@@ -21,8 +21,11 @@ export async function DELETE(req, { params }) {
       );
     }
 
-    const { movieId } = params;
-    if (!movieId) {
+    const { movieId } = await context.params;
+    const normalizedMovieId =
+      typeof movieId === "string" ? decodeURIComponent(movieId) : "";
+
+    if (!normalizedMovieId) {
       return NextResponse.json(
         { message: "Movie ID is required" },
         { status: 400 }
@@ -44,8 +47,11 @@ export async function DELETE(req, { params }) {
       user.myList = [];
     }
 
-    // Remove movie from list
-    user.myList = user.myList.filter((m) => m.id !== parseInt(movieId));
+    // Remove movie from list (supports TMDB numeric IDs and custom string IDs)
+    const targetId = String(normalizedMovieId);
+    user.myList = user.myList.filter(
+      (m) => String(m.id ?? m.videoId) !== targetId
+    );
     await user.save();
 
     return NextResponse.json({

@@ -1,6 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { getOrCreateDeviceId } from "@/lib/deviceId";
 
 export default function Signup() {
   const router = useRouter();
@@ -49,10 +50,11 @@ export default function Signup() {
     setLoading(true);
 
     try {
+      const deviceId = getOrCreateDeviceId();
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, deviceId }),
       });
 
       const data = await res.json();

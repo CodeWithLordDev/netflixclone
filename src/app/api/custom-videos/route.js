@@ -33,18 +33,18 @@ export async function GET(req) {
           { genre: { $regex: search, $options: "i" } },
         ],
       }).sort({ createdAt: -1 });
-      console.log("🔍 Search query:", search, "Results:", videos.length);
+      // console.log("🔍 Search query:", search, "Results:", videos.length);
       return Response.json(videos);
     }
 
     // Get all public videos - NO FILTER FIRST TO DEBUG
-    console.log("📺 Fetching all videos...");
+    // console.log("📺 Fetching all videos...");
     const allVideos = await CustomVideo.find({}).sort({ createdAt: -1 });
-    console.log("📺 All videos in DB:", allVideos.length);
-    console.log("📺 Videos data:", allVideos.map(v => ({ id: v._id, videoId: v.videoId, title: v.title, isPublic: v.isPublic })));
+    // console.log("📺 All videos in DB:", allVideos.length);
+    // console.log("📺 Videos data:", allVideos.map(v => ({ id: v._id, videoId: v.videoId, title: v.title, isPublic: v.isPublic })));
     
     const videos = await CustomVideo.find({ isPublic: true }).sort({ createdAt: -1 });
-    console.log("📺 Public videos (isPublic: true):", videos.length);
+    // console.log("📺 Public videos (isPublic: true):", videos.length);
     return Response.json(videos);
   } catch (error) {
     console.error("Error fetching custom videos:", error);
