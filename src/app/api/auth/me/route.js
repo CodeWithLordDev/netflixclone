@@ -1,37 +1,30 @@
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/jwt";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
+import { ACCESS_COOKIE, REFRESH_COOKIE, verifyJwt } from "@/lib/jwt";
 
 export async function GET(req) {
   try {
-    const token = req.cookies.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { message: "No token found" },
-        { status: 401 }
-      );
+    const access = req.cookies.get(ACCESS_COOKIE)?.value || req.cookies.get("token")?.value;
+    if (!access) {
+      return NextResponse.json({ message: "No token found" }, { status: 401 });
     }
 
-    const decoded = verifyToken(token);
-    
+    const decoded = verifyJwt(access);
+    if (!decoded?.id) {
+      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+    }
+
     await connectDB();
-    const user = await User.findById(decoded.id).select("name email plan subscriptionExpiresAt");
+    const user = await User.findById(decoded.id)
+      .select("name email role plan subscriptionExpiresAt isActive isBanned createdAt");
 
     if (!user) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("❌ Error fetching user:", error.message);
-    return NextResponse.json(
-      { message: "Server error", error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt";
 // In your server.js or routes file
 import { checkUserPlan } from './middleware/CheckUserPlan.js';
 
@@ -14,7 +14,7 @@ export function middleware(req) {
   }
 
   try {
-    const user = verifyToken(token);
+    const user = verifyJwt(token);
 
     // 🧾 PREMIUM CONTENT PROTECTION
     if (pathname.startsWith("/browse/premium")) {
@@ -44,3 +44,4 @@ export const config = {
     "/browse/premium/:path*",
   ],
 };
+

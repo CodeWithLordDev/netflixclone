@@ -9,7 +9,45 @@
 
 /* Base background color for the app */
 body {
-  @apply bg-black; 
+  @apply bg-black;
+  overflow-x: hidden;
+}
+
+:root {
+  --netflix-bg: #0b0b0f;
+  --netflix-panel: #14141a;
+  --netflix-border: #27272a;
+  --netflix-red: #e50914;
+  --dash-bg: #0c1118;
+  --dash-panel: #131a24;
+  --dash-border: rgba(148, 163, 184, 0.2);
+  --dash-text: #e7edf7;
+  --dash-muted: #9aa6bb;
+  --dash-accent: #38bdf8;
+  --dash-success: #22c55e;
+  --dash-danger: #ef4444;
+}
+
+html[data-theme="light"] {
+  --dash-bg: #f4f7fb;
+  --dash-panel: #ffffff;
+  --dash-border: rgba(71, 85, 105, 0.22);
+  --dash-text: #0f172a;
+  --dash-muted: #526277;
+  --dash-accent: #0284c7;
+  --dash-success: #16a34a;
+  --dash-danger: #dc2626;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Custom CSS for the Rank Number Stroke Effect */

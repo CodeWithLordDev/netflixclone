@@ -1,6 +1,6 @@
 import Razorpay from "razorpay";
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt";
 
 export const runtime = "nodejs";
 
@@ -28,7 +28,7 @@ export async function POST(req) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const user = verifyToken(token);
+    const user = verifyJwt(token);
     if (!user) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
@@ -71,3 +71,4 @@ export async function POST(req) {
     );
   }
 }
+

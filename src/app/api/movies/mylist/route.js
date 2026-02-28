@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
-import { verifyToken } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt";
 
 export async function GET(req) {
   try {
@@ -13,7 +13,7 @@ export async function GET(req) {
       );
     }
 
-    const decoded = verifyToken(token);
+    const decoded = verifyJwt(token);
     if (!decoded) {
       return NextResponse.json(
         { message: "Invalid token" },
@@ -53,7 +53,7 @@ export async function POST(req) {
       );
     }
 
-    const decoded = verifyToken(token);
+    const decoded = verifyJwt(token);
     if (!decoded) {
       return NextResponse.json(
         { message: "Invalid token" },
@@ -121,3 +121,4 @@ export async function POST(req) {
     );
   }
 }
+

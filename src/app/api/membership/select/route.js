@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
-import { verifyToken, signToken } from "@/lib/jwt";
+import { verifyJwt, signAccessToken } from "@/lib/jwt";
 
 export async function POST(req) {
   try {
@@ -17,7 +17,7 @@ export async function POST(req) {
     }
 
     // ✅ 2. VERIFY TOKEN
-    const userData = verifyToken(token);
+    const userData = verifyJwt(token);
     if (!userData) {
       // console.log("❌ Invalid token");
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
@@ -70,7 +70,7 @@ export async function POST(req) {
     // console.log("✅ User updated:", user.email, "Plan:", user.plan);
 
     // ✅ 5. SIGN NEW JWT
-    const newToken = signToken(user, { deviceId: userData.deviceId });
+    const newToken = signAccessToken(user, { deviceId: userData.deviceId });
 
     // ✅ 6. SEND RESPONSE WITH COOKIE
     const res = NextResponse.json({
@@ -99,3 +99,4 @@ export async function POST(req) {
     );
   }
 }
+

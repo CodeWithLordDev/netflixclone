@@ -62,11 +62,12 @@ export default function SigninClient() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push("/browse");
+        router.push(data.redirectTo || "/browse");
       } else if (res.status === 404) {
         router.push("/signup");
       } else {
-        setError(data.message || "Invalid email or password");
+        const detail = data?.error ? ` (${data.error})` : "";
+        setError((data.message || "Invalid email or password") + detail);
       }
     } catch (err) {
       setError("Something went wrong. Please try again.");

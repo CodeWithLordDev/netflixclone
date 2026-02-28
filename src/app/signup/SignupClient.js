@@ -60,7 +60,7 @@ export default function Signup() {
       const data = await res.json();
 
       if (res.ok) {
-        router.push("/membership");
+        router.push(data.redirectTo || "/subscription");
       } else {
         setError(data.message || "Something went wrong");
       }

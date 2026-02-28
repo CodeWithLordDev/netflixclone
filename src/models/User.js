@@ -21,6 +21,33 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    role: {
+      type: String,
+      enum: ["user", "moderator", "admin", "superadmin"],
+      default: "user",
+      lowercase: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
+    banReason: {
+      type: String,
+      default: null,
+    },
+    bannedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    lastLoginAt: {
+      type: Date,
+      default: null,
+    },
     activeSessions: [
       {
         deviceId: {

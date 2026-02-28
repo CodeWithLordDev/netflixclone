@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import User from "@/models/User";
-import { verifyToken, signToken } from "@/lib/jwt";
+import { verifyJwt, signAccessToken } from "@/lib/jwt";
 
 export async function POST(req) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const userData = verifyToken(token);
+    const userData = verifyJwt(token);
     if (!userData) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
@@ -73,7 +73,7 @@ export async function POST(req) {
     }
 
     // 🔐 CREATE NEW JWT - Pass entire user object
-    const newToken = signToken(updatedUser, { deviceId: userData.deviceId });
+    const newToken = signAccessToken(updatedUser, { deviceId: userData.deviceId });
 
     const res = NextResponse.json({
       message: "Payment verified & subscription activated",
@@ -98,3 +98,4 @@ export async function POST(req) {
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
-import { verifyToken } from "@/lib/jwt";
+import { verifyJwt } from "@/lib/jwt";
 
 export async function DELETE(req, context) {
   try {
@@ -13,7 +13,7 @@ export async function DELETE(req, context) {
       );
     }
 
-    const decoded = verifyToken(token);
+    const decoded = verifyJwt(token);
     if (!decoded) {
       return NextResponse.json(
         { message: "Invalid token" },
@@ -66,3 +66,4 @@ export async function DELETE(req, context) {
     );
   }
 }
+
