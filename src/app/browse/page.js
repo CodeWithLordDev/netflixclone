@@ -299,8 +299,12 @@ const [pendingVideo, setPendingVideo] = useState(null);
 
   const fetchCustomVideos = async () => {
     try {
-      const response = await fetch("/api/custom-videos");
+      const [response, uploadsResponse] = await Promise.all([
+        fetch("/api/custom-videos"),
+        fetch("/api/videos"),
+      ]);
       // console.log("API Response status:", response.status);
+      const uploadedData = uploadsResponse.ok ? await uploadsResponse.json() : [];
       if (response.ok) {
         const data = await response.json();
         // console.log("✅ Fetched custom videos - Raw data:", data);
@@ -309,8 +313,25 @@ const [pendingVideo, setPendingVideo] = useState(null);
         
         // Handle if data is an object with results property
         const videos = Array.isArray(data) ? data : (data.videos || data.results || []);
-        // console.log("✅ Processed videos:", videos);
-        return videos;
+        const uploads = Array.isArray(uploadedData) ? uploadedData : (uploadedData.videos || uploadedData.results || []);
+        const merged = [
+          ...uploads.map((video) => ({
+            ...video,
+            isCustom: true,
+            genre: video.genre || video.category,
+            category: video.category || video.genre,
+          })),
+          ...videos.map((video) => ({
+            ...video,
+            isCustom: true,
+            genre: video.genre || video.category,
+            category: video.category || video.genre,
+          })),
+        ];
+        console.info("[custom] fetched uploads:", uploads.length);
+        console.info("[custom] fetched legacy:", videos.length);
+        console.info("[custom] combined:", merged.length);
+        return merged;
       } else {
         console.error("API returned status:", response.status);
         const errorText = await response.text();
@@ -493,14 +514,15 @@ const handleAdFinished = () => {
     
     if (query.length > 0) {
       // Filter based on active tab
-      if (activeNav === "custom") {
-        // Search in custom videos
-        const filtered = customVideos.filter(video =>
-          video.title.toLowerCase().includes(query.toLowerCase()) ||
-          (video.description && video.description.toLowerCase().includes(query.toLowerCase())) ||
-          (video.genre && video.genre.toLowerCase().includes(query.toLowerCase()))
-        );
-        setMovies(filtered);
+        if (activeNav === "custom") {
+          // Search in custom videos
+          const filtered = customVideos.filter(video =>
+            video.title.toLowerCase().includes(query.toLowerCase()) ||
+            (video.description && video.description.toLowerCase().includes(query.toLowerCase())) ||
+            (video.genre && video.genre.toLowerCase().includes(query.toLowerCase())) ||
+            (video.category && video.category.toLowerCase().includes(query.toLowerCase()))
+          );
+          setMovies(filtered);
       } else if (activeNav === "mylist") {
         // Search in my list
         const filtered = myList.filter(movie =>

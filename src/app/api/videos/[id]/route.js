@@ -1,58 +1,48 @@
-import { NextResponse } from "next/server";
+import path from "path";
+import { promises as fs } from "fs";
 import { connectDB } from "@/lib/mongodb";
 import Video from "@/models/Video";
-import { getSessionFromJwt } from "@/lib/auth/guard";
-import { Roles, normalizeRole } from "@/lib/auth/rbac";
-import { videoSchema } from "@/lib/validators/platform";
+import { requireAdmin } from "@/lib/auth/guard";
+import { Roles } from "@/lib/auth/rbac";
+
+async function removeFile(publicPath = "") {
+  if (!publicPath) return;
+  const cleanPath = publicPath.startsWith("/") ? publicPath.slice(1) : publicPath;
+  const fullPath = path.join(process.cwd(), "public", cleanPath);
+  try {
+    await fs.unlink(fullPath);
+  } catch {}
+}
 
 export async function PUT(request, { params }) {
-  const session = await getSessionFromJwt();
-  if (!session?.user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const gate = await requireAdmin([Roles.SUPER_ADMIN]);
+  if (gate.error) return gate.error;
 
-  const role = normalizeRole(session.user.role);
-  if (![Roles.ADMIN, Roles.SUPER_ADMIN].includes(role)) {
-    return NextResponse.json({ message: "Only admin/superadmin can edit videos" }, { status: 403 });
-  }
-
-  const parsed = videoSchema.partial().safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ message: "Invalid video payload", errors: parsed.error.flatten() }, { status: 400 });
-  }
+  const payload = await request.json();
+  const update = {
+    title: payload.title,
+    description: payload.description,
+    category: payload.category,
+    status: String(payload.status || "").toUpperCase() === "PRIVATE" ? "PRIVATE" : "PUBLIC",
+    tags: Array.isArray(payload.tags) ? payload.tags : String(payload.tags || "").split(",").map((t) => t.trim()).filter(Boolean),
+  };
 
   await connectDB();
-  const updated = await Video.findByIdAndUpdate(params.id, { $set: parsed.data }, { new: true });
-  if (!updated) return NextResponse.json({ message: "Video not found" }, { status: 404 });
-
-  return NextResponse.json(updated);
+  const updated = await Video.findByIdAndUpdate(params.id, { $set: update }, { new: true }).lean();
+  if (!updated) return Response.json({ error: "Video not found" }, { status: 404 });
+  return Response.json(updated);
 }
 
 export async function DELETE(request, { params }) {
-  const session = await getSessionFromJwt();
-  if (!session?.user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const gate = await requireAdmin([Roles.SUPER_ADMIN]);
+  if (gate.error) return gate.error;
 
-  const role = normalizeRole(session.user.role);
   await connectDB();
+  const video = await Video.findById(params.id).lean();
+  if (!video) return Response.json({ error: "Video not found" }, { status: 404 });
 
-  if (role === Roles.MODERATOR) {
-    const payload = await request.json().catch(() => ({}));
-    const reason = payload?.reason || "Removed by moderator";
+  await Video.deleteOne({ _id: params.id });
+  await Promise.all([removeFile(video.videoUrl), removeFile(video.thumbnail)]);
 
-    const moderated = await Video.findByIdAndUpdate(
-      params.id,
-      { $set: { isRemovedByModerator: true, moderationReason: reason } },
-      { new: true }
-    );
-
-    if (!moderated) return NextResponse.json({ message: "Video not found" }, { status: 404 });
-    return NextResponse.json({ message: "Video removed by moderator", video: moderated });
-  }
-
-  if (![Roles.ADMIN, Roles.SUPER_ADMIN].includes(role)) {
-    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-  }
-
-  const deleted = await Video.findByIdAndDelete(params.id);
-  if (!deleted) return NextResponse.json({ message: "Video not found" }, { status: 404 });
-
-  return NextResponse.json({ message: "Video deleted" });
+  return Response.json({ ok: true });
 }
