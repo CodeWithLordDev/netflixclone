@@ -2,11 +2,11 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 
-export default function PaymentPage() {
+function PaymentClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("planId") || "";
@@ -160,5 +160,15 @@ export default function PaymentPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={<p className="min-h-screen px-4 py-10 text-sm text-zinc-400">Loading payment details...</p>}
+    >
+      <PaymentClient />
+    </Suspense>
   );
 }
