@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
+    firstName: {
+      type: String,
+      default: "",
+    },
+    lastName: {
+      type: String,
+      default: "",
+    },
     name: String,
     email: {
       type: String,
@@ -16,6 +24,30 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["free", "premium"],
       default: "free",
+    },
+    subscriptionPlan: {
+      type: String,
+      default: "",
+    },
+    subscriptionStatus: {
+      type: String,
+      default: "",
+    },
+    subscriptionStartDate: {
+      type: Date,
+      default: null,
+    },
+    subscriptionEndDate: {
+      type: Date,
+      default: null,
+    },
+    billingCycle: {
+      type: String,
+      default: "",
+    },
+    price: {
+      type: Number,
+      default: 0,
     },
     subscriptionExpiresAt: {
       type: Date,
@@ -66,6 +98,23 @@ const UserSchema = new mongoose.Schema(
           type: Date,
           default: Date.now,
         },
+      },
+    ],
+    profiles: [
+      {
+        name: { type: String, required: true },
+        type: { type: String, enum: ["kids", "personal", "family"], default: "personal" },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
+    paymentMethods: [
+      {
+        brand: { type: String, default: "" },
+        last4: { type: String, default: "" },
+        expMonth: { type: Number, default: 0 },
+        expYear: { type: Number, default: 0 },
+        isDefault: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
     myList: [

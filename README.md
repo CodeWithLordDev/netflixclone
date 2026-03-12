@@ -1,6 +1,6 @@
-# Netflix Clone — JavaScript Files Summary
+# StreamFlix Clone — JavaScript Files Summary
 
-Project root: d:\Sigma web\Project\Websites\Netflix_Clone\Frontend\my-app\src\app
+Project root: d:\Sigma web\Project\Websites\StreamFlix_Clone\Frontend\my-app\src\app
 
 ## Files covered
 - page.js

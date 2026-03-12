@@ -6,6 +6,7 @@ import Payment from "@/models/Payment";
 import { getSessionFromJwt } from "@/lib/auth/guard";
 import { Roles, normalizeRole } from "@/lib/auth/rbac";
 import { subscriptionSchema } from "@/lib/validators/platform";
+import User from "@/models/User";
 
 function calculateExpiry(durationDays) {
   const ms = durationDays * 24 * 60 * 60 * 1000;
@@ -55,15 +56,40 @@ export async function POST(request) {
     isActive: true,
     paymentStatus: "paid",
     transactionRef: payload.transactionRef || `manual_${Date.now()}`,
+    amount: plan.price,
+    currency: "INR",
   });
 
   await Payment.create({
     userId: targetUserId,
     amount: plan.price,
-    currency: "USD",
+    currency: "INR",
     status: "success",
     paymentId: payload.transactionRef || `subscription_${Date.now()}`,
   });
+
+  const normalizedPlanName = String(plan.name || "").trim().toLowerCase();
+  const isFreePlan = Number(plan.price || 0) <= 0 || normalizedPlanName === "free" || normalizedPlanName === "free plan";
+  const userPlan = isFreePlan ? "free" : "premium";
+  const startDate = subscription.startDate || new Date();
+  const expiryDate = subscription.expiryDate;
+
+  await User.findByIdAndUpdate(
+    targetUserId,
+    {
+      $set: {
+        plan: userPlan,
+        subscriptionPlan: plan.name,
+        subscriptionStatus: "active",
+        subscriptionStartDate: startDate,
+        subscriptionEndDate: expiryDate,
+        billingCycle: plan.billingCycle || "",
+        price: plan.price,
+        subscriptionExpiresAt: expiryDate,
+      },
+    },
+    { new: true }
+  );
 
   return NextResponse.json(subscription, { status: 201 });
 }

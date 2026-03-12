@@ -26,7 +26,10 @@ export default function PlansGrid({ plans = [], canManagePlans = false, onEdit, 
                 {plan.isActive ? "Active" : "Inactive"}
               </Badge>
             </div>
-            <p className="text-2xl font-semibold text-[var(--dash-text)]">${Number(plan.price || 0).toLocaleString()}</p>
+            <p className="text-2xl font-semibold text-[var(--dash-text)]">
+              ₹{Number(plan.price || 0).toLocaleString("en-IN")}
+              {plan.billingCycle ? ` / ${plan.billingCycle === "yearly" ? "year" : "month"}` : ""}
+            </p>
             <p className="text-sm text-[var(--dash-muted)]">{plan.subscriberCount || 0} active users</p>
             <ul className="space-y-1 text-sm text-[var(--dash-muted)]">
               {(plan.features || []).slice(0, 3).map((feature) => (

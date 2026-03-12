@@ -60,7 +60,7 @@ const Footer = () => {
             Legal Notices
           </a>
           <a href="#" className="underline hover:text-white transition">
-            Only on Netflix
+            Only on StreamFlix
           </a>
         </div>
 
@@ -73,7 +73,7 @@ const Footer = () => {
         </div>
 
         {/* Region Text */}
-        <p className="text-sm mb-5">Netflix India</p>
+        <p className="text-sm mb-5">StreamFlix India</p>
 
         {/* Bottom Disclaimer */}
         <p className="text-xs max-w-xl leading-relaxed text-neutral-500">

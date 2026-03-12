@@ -28,7 +28,7 @@ const page = () => {
         {/* Description */}
         <p className="mb-6 text-base">
           We will send a sign-up link to <strong>ayushtemkar9@gmail.com</strong>{" "}
-          so you can use Netflix without a password on any device at any time.
+          so you can use StreamFlix without a password on any device at any time.
         </p>
 
         {/* Button */}

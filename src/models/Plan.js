@@ -5,7 +5,7 @@ const PlanSchema = new mongoose.Schema(
     name: { type: String, required: true, unique: true },
     description: { type: String, default: "" },
     price: { type: Number, required: true, min: 0 },
-    currency: { type: String, default: "USD" },
+    currency: { type: String, default: "INR" },
     duration: { type: Number, required: true, min: 1 },
     billingCycle: { type: String, enum: ["monthly", "yearly"], default: "monthly" },
     videoQuality: { type: String, enum: ["SD", "HD", "FHD", "4K"], default: "HD" },

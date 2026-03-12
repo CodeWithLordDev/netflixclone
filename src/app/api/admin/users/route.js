@@ -39,7 +39,7 @@ export async function GET(request) {
     const [total, users] = await Promise.all([
       User.countDocuments(query),
       User.find(query)
-        .select("_id name email role isActive isBanned plan lastLoginAt createdAt")
+        .select("_id name firstName lastName email role isActive isBanned plan lastLoginAt createdAt")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -51,6 +51,8 @@ export async function GET(request) {
         users.map((user) => ({
           id: String(user._id),
           name: user.name || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
           email: user.email,
           role: user.role,
           status: user.isBanned ? "banned" : user.isActive ? "active" : "inactive",

@@ -6,7 +6,7 @@ const RevenueSchema = new mongoose.Schema(
     subscriptionId: { type: mongoose.Schema.Types.ObjectId, ref: "Subscription", required: true },
     planId: { type: mongoose.Schema.Types.ObjectId, ref: "Plan", required: true },
     amount: { type: Number, required: true },
-    currency: { type: String, default: "USD" },
+    currency: { type: String, default: "INR" },
     transactionRef: { type: String, required: true, unique: true },
     status: { type: String, enum: ["pending", "completed", "failed", "refunded"], default: "pending" },
     paymentMethod: { type: String, default: "card" },

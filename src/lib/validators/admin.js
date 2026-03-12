@@ -32,11 +32,21 @@ export const reportUpdateSchema = z.object({
 });
 
 export const notifySchema = z.object({
-  userId: z.string().min(1),
+  audience: z.enum(["all", "user"]).default("user"),
+  userId: z.string().optional().or(z.literal("")),
   title: z.string().min(3).max(120),
   message: z.string().min(5).max(300),
   type: z.enum(["info", "warning", "success", "danger"]).default("info"),
   actionUrl: z.string().optional().or(z.literal("")),
+});
+
+export const adSchema = z.object({
+  title: z.string().min(2).max(160),
+  videoUrl: z.string().url(),
+  duration: z.number().int().positive(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  targetPlan: z.enum(["free"]).default("free"),
+  revenuePerView: z.number().min(0).default(0),
 });
 
 export const subscriptionPlanSchema = z.object({

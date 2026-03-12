@@ -11,7 +11,7 @@ const SubscriptionSchema = new mongoose.Schema(
     paymentStatus: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "pending" },
     transactionRef: { type: String, default: "" },
     amount: { type: Number, required: true },
-    currency: { type: String, default: "USD" },
+    currency: { type: String, default: "INR" },
     cancelledAt: { type: Date, default: null },
     cancelledReason: { type: String, default: "" },
   },

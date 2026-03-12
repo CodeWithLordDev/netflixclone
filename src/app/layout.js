@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Netflix Clone",
+  title: "StreamFlix Clone",
   description: "This for Study Purpose to understand how Steaming Platform Works",
 };
 

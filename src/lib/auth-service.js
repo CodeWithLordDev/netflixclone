@@ -4,7 +4,7 @@ import { ACCESS_COOKIE, REFRESH_COOKIE, getCookieOptions, hashToken, signAccessT
 import RefreshToken from "@/models/RefreshToken";
 import User from "@/models/User";
 
-export async function registerUser({ name, email, password }) {
+export async function registerUser({ firstName, lastName, email, password }) {
   await connectDB();
 
   const exists = await User.findOne({ email });
@@ -13,8 +13,11 @@ export async function registerUser({ name, email, password }) {
   }
 
   const hashed = await bcrypt.hash(password, 10);
+  const fullName = `${firstName} ${lastName}`.trim();
   const user = await User.create({
-    name: name || email.split("@")[0],
+    firstName,
+    lastName,
+    name: fullName || email.split("@")[0],
     email,
     password: hashed,
     role: "user",

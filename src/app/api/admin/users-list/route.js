@@ -50,7 +50,7 @@ export async function GET(request) {
 
     const [users, total] = await Promise.all([
       User.find(query)
-        .select("_id name email role isActive isBanned plan subscriptionExpiresAt lastLoginAt createdAt")
+        .select("_id name firstName lastName email role isActive isBanned plan subscriptionExpiresAt lastLoginAt createdAt")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

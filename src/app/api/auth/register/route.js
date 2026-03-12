@@ -9,9 +9,9 @@ export async function POST(req) {
       return NextResponse.json({ message: "Invalid input", errors: payload.error.flatten() }, { status: 400 });
     }
 
-    const { name, email, password } = payload.data;
+    const { firstName, lastName, email, password } = payload.data;
 
-    const created = await registerUser({ name, email, password });
+    const created = await registerUser({ firstName, lastName, email, password });
     if (created.error) {
       return NextResponse.json({ message: created.error.message }, { status: created.error.status });
     }

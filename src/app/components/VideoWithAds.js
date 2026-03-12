@@ -2,12 +2,17 @@
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, X } from "lucide-react";
 
-const ADS = ["/ad/ad1.mp4"];
 const AD_INTERVAL = 30;
 
-export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
+export default function VideoWithAds({ videoSrc, title, onClose }) {
   const videoRef = useRef(null);
   const hideControlsTimeout = useRef(null);
+  const resumeTimeRef = useRef(0);
+  const lastAdTimeRef = useRef(0);
+
+  const [ads, setAds] = useState([]);
+  const [showAds, setShowAds] = useState(false);
+  const [adsReady, setAdsReady] = useState(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -19,9 +24,8 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
 
   const [isAdPlaying, setIsAdPlaying] = useState(false);
   const [adIndex, setAdIndex] = useState(0);
-  const resumeTimeRef = useRef(0);
+  const [currentAdId, setCurrentAdId] = useState(null);
 
-  /* ---------------- LOCK BODY SCROLL ---------------- */
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -29,22 +33,48 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
     };
   }, []);
 
-  /* ---------------- CONTROLS VISIBILITY ---------------- */
+  useEffect(() => {
+    let active = true;
+    const loadAds = async () => {
+      try {
+        const res = await fetch("/api/ads", { cache: "no-store" });
+        const data = await res.json();
+        if (!active) return;
+        setShowAds(Boolean(data?.showAds));
+        setAds(Array.isArray(data?.ads) ? data.ads : []);
+      } catch (error) {
+        setShowAds(false);
+        setAds([]);
+      } finally {
+        if (active) setAdsReady(true);
+      }
+    };
+    loadAds();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!adsReady) return;
+    if (showAds && ads.length > 0) {
+      playAd(true);
+    } else if (videoRef.current) {
+      videoRef.current.src = videoSrc;
+    }
+  }, [adsReady, showAds, ads.length, videoSrc]);
+
   const handleMouseMove = () => {
-    if (isAdPlaying) return; // keep visible during ad
+    if (isAdPlaying) return;
 
     setShowControls(true);
     clearTimeout(hideControlsTimeout.current);
 
     if (isPlaying) {
-      hideControlsTimeout.current = setTimeout(
-        () => setShowControls(false),
-        3000
-      );
+      hideControlsTimeout.current = setTimeout(() => setShowControls(false), 3000);
     }
   };
 
-  /* ---------------- PLAY / PAUSE ---------------- */
   const handlePlayPause = () => {
     if (!videoRef.current) return;
 
@@ -57,7 +87,6 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
     }
   };
 
-  /* ---------------- MUTE / VOLUME ---------------- */
   const handleMute = () => {
     if (!videoRef.current) return;
     videoRef.current.muted = !isMuted;
@@ -73,41 +102,39 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
     }
   };
 
-  /* ---------------- FULLSCREEN ---------------- */
   const handleFullscreen = () => {
     videoRef.current?.requestFullscreen?.();
   };
 
-  /* ---------------- PROGRESS ---------------- */
   const handleProgressClick = () => {
-    if (isAdPlaying) return; // 🚫 no seeking ads
+    if (isAdPlaying) return;
   };
 
-  const handleTimeUpdate = () => {
-    if (!videoRef.current) return;
-
-    setCurrentTime(videoRef.current.currentTime);
-    setProgress((videoRef.current.currentTime / duration) * 100);
-
-    if (
-      !isPremium &&
-      !isAdPlaying &&
-      videoRef.current.currentTime - resumeTimeRef.current >= AD_INTERVAL
-    ) {
-      playAd();
+  const recordAdView = async (adId) => {
+    if (!adId) return;
+    try {
+      await fetch("/api/ads/view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adId }),
+      });
+    } catch (error) {
+      // silent
     }
   };
 
-  /* ---------------- AD PLAY ---------------- */
-  const playAd = () => {
-    if (!videoRef.current) return;
+  const playAd = (isPreRoll = false) => {
+    if (!videoRef.current || ads.length === 0) return;
 
-    resumeTimeRef.current = videoRef.current.currentTime;
+    resumeTimeRef.current = isPreRoll ? 0 : videoRef.current.currentTime;
     setIsAdPlaying(true);
     setShowControls(true);
 
+    const nextAd = ads[adIndex % ads.length];
+    setCurrentAdId(nextAd.id);
+
     videoRef.current.pause();
-    videoRef.current.src = ADS[adIndex % ADS.length];
+    videoRef.current.src = nextAd.videoUrl;
 
     videoRef.current.onloadedmetadata = () => {
       videoRef.current.play();
@@ -117,7 +144,6 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
     setAdIndex((i) => i + 1);
   };
 
-  /* ---------------- RESUME MAIN VIDEO ---------------- */
   const resumeVideo = () => {
     if (!videoRef.current) return;
 
@@ -126,24 +152,32 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
 
     videoRef.current.onloadedmetadata = () => {
       videoRef.current.currentTime = resumeTimeRef.current;
+      lastAdTimeRef.current = resumeTimeRef.current;
       videoRef.current.play();
       setIsPlaying(true);
       setIsAdPlaying(false);
+      setCurrentAdId(null);
     };
   };
 
-  /* ---------------- INITIAL LOAD ---------------- */
-  useEffect(() => {
-    if (!isPremium) {
-      playAd();
-    } else if (videoRef.current) {
-      videoRef.current.src = videoSrc;
-    }
-  }, []);
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
 
-  /* ---------------- END HANDLER ---------------- */
+    setCurrentTime(videoRef.current.currentTime);
+    setProgress((videoRef.current.currentTime / duration) * 100);
+
+    if (showAds && !isAdPlaying && ads.length > 0) {
+      if (videoRef.current.currentTime - lastAdTimeRef.current >= AD_INTERVAL) {
+        playAd(false);
+      }
+    }
+  };
+
   const handleEnded = () => {
-    if (isAdPlaying) resumeVideo();
+    if (isAdPlaying) {
+      recordAdView(currentAdId);
+      resumeVideo();
+    }
   };
 
   const formatTime = (t) => {
@@ -153,14 +187,9 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  /* ---------------- UI ---------------- */
   return (
     <div className="fixed inset-0 bg-black z-50 overflow-hidden">
-      <div
-        className="w-full h-full relative"
-        onMouseMove={handleMouseMove}
-      >
-        {/* Close */}
+      <div className="w-full h-full relative" onMouseMove={handleMouseMove}>
         <button
           onClick={onClose}
           className="absolute top-4 right-4 z-20 bg-red-600 p-2 rounded-full"
@@ -168,15 +197,11 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
           <X className="text-white" />
         </button>
 
-        {/* Title */}
         <div className="absolute top-4 left-4 z-20 text-white">
           <h2 className="font-bold">{title}</h2>
-          {isAdPlaying && (
-            <span className="text-xs text-red-500">Advertisement</span>
-          )}
+          {isAdPlaying && <span className="text-xs text-red-500">Advertisement</span>}
         </div>
 
-        {/* Video */}
         <video
           ref={videoRef}
           className="w-full h-full object-contain"
@@ -186,7 +211,6 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
           onClick={handlePlayPause}
         />
 
-        {/* Controls */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black">
           <div className="flex justify-between items-center text-white">
             <div className="flex items-center gap-4">
@@ -194,9 +218,7 @@ export default function VideoWithAds({ videoSrc, title, onClose, isPremium }) {
                 {isPlaying ? <Pause /> : <Play />}
               </button>
 
-              <button onClick={handleMute}>
-                {isMuted ? <VolumeX /> : <Volume2 />}
-              </button>
+              <button onClick={handleMute}>{isMuted ? <VolumeX /> : <Volume2 />}</button>
 
               <input
                 type="range"

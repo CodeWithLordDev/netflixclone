@@ -104,34 +104,34 @@ export default function TrendingNow() {
 
   const faqData = [
     {
-      question: "What is Netflix?",
+      question: "What is StreamFlix?",
       answer:
-        "Netflix is a streaming service that offers a wide variety of award-winning TV shows, movies, anime, documentaries and more – on thousands of internet-connected devices.\n\nYou can watch as much as you want, whenever you want, without a single ad – all for one low monthly price. There's always something new to discover, and new TV shows and movies are added every week!",
+        "StreamFlix is a streaming service that offers a wide variety of award-winning TV shows, movies, anime, documentaries and more – on thousands of internet-connected devices.\n\nYou can watch as much as you want, whenever you want, without a single ad – all for one low monthly price. There's always something new to discover, and new TV shows and movies are added every week!",
     },
     {
-      question: "How much does Netflix cost?",
+      question: "How much does StreamFlix cost?",
       answer:
-        "Watch Netflix on your smartphone, tablet, smart TV, laptop, or streaming device for one fixed monthly fee. Plans range to fit your budget.",
+        "Watch StreamFlix on your smartphone, tablet, smart TV, laptop, or streaming device for one fixed monthly fee. Plans range to fit your budget.",
     },
     {
       question: "Where can I watch?",
       answer:
-        "Watch anywhere, anytime. Sign in with your Netflix account to watch instantly on the web at netflix.com from your personal device.",
+        "Watch anywhere, anytime. Sign in with your StreamFlix account to watch instantly on the web at netflix.com from your personal device.",
     },
     {
       question: "How do I cancel?",
       answer:
-        "Netflix is flexible. There are no annoying contracts and no commitments. Cancel online anytime.",
+        "StreamFlix is flexible. There are no annoying contracts and no commitments. Cancel online anytime.",
     },
     {
-      question: "What can I watch on Netflix?",
+      question: "What can I watch on StreamFlix?",
       answer:
-        "Netflix has an extensive library of feature films, documentaries, TV shows, anime, award-winning Netflix originals, and more.",
+        "StreamFlix has an extensive library of feature films, documentaries, TV shows, anime, award-winning StreamFlix originals, and more.",
     },
     {
-      question: "Is Netflix good for kids?",
+      question: "Is StreamFlix good for kids?",
       answer:
-        "Netflix Kids experience is designed to give parents control and kids a safe space to enjoy family-friendly content.",
+        "StreamFlix Kids experience is designed to give parents control and kids a safe space to enjoy family-friendly content.",
     },
   ];
 

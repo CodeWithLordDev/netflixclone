@@ -192,7 +192,9 @@ export default function UsersManagementTable() {
                 <tbody className="divide-y divide-slate-700/50">
                   {users.map((user) => (
                     <tr key={user._id} className="hover:bg-slate-700/20 transition">
-                      <td className="px-4 py-3 font-medium">{user.name}</td>
+                      <td className="px-4 py-3 font-medium">
+                        {user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "-"}
+                      </td>
                       <td className="px-4 py-3 text-slate-300">{user.email}</td>
                       <td className="px-4 py-3">
                         <UserBadge role={user.role} />

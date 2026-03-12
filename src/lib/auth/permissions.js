@@ -27,6 +27,8 @@ export const Permissions = {
   LOGS_VIEW: "logs:view",
   NOTIFICATIONS_VIEW: "notifications:view",
   NOTIFICATIONS_MANAGE: "notifications:manage",
+  ADS_VIEW: "ads:view",
+  ADS_MANAGE: "ads:manage",
 };
 
 const PERMISSIONS_BY_ROLE = {

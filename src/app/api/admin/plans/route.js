@@ -93,7 +93,7 @@ export async function POST(request) {
       name,
       description: body.description || "",
       price: body.price,
-      currency: "USD",
+      currency: "INR",
       duration: Number(body.duration),
       billingCycle,
       videoQuality: body.videoQuality || "HD",

@@ -70,7 +70,7 @@ export default function PaymentPage() {
         key: orderData.key_id,
         amount: orderData.amount,
         currency: "INR",
-        name: "Netflix Clone",
+        name: "StreamFlix Clone",
         description: `${plan.name} subscription`,
         order_id: orderData.order_id,
         handler: async (response) => {

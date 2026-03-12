@@ -4,6 +4,7 @@ import { Play, Info, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import MovieDetailModal from "../components/MovieDetailModal";
 import VideoPlayer from "../components/VideoPlayer";
 import VideoWithAds from "../components/VideoWithAds";
+import StreamFlixLogo from "../components/StreamFlixLogo";
 
 // MovieRow component defined outside
 const MovieRow = ({ title, movies, rowId, onMovieClick, myList, onAddToMyList, onRemoveFromMyList }) => {
@@ -43,7 +44,7 @@ const MovieRow = ({ title, movies, rowId, onMovieClick, myList, onAddToMyList, o
             return (
               <div
                 key={movieKey}
-                className="flex-none w-40 md:w-48 lg:w-56 group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
+                className="movie-card flex-none w-40 md:w-48 lg:w-56 group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
               >
                 <img
                   src={
@@ -123,7 +124,7 @@ const MovieGrid = ({ title, movies, gridId, onMovieClick, myList, onAddToMyList,
         return (
           <div
             key={movieKey}
-            className="group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
+            className="movie-card group/movie relative transition-transform duration-300 hover:scale-110 hover:z-20"
           >
             <img
               src={
@@ -178,7 +179,7 @@ const MovieGrid = ({ title, movies, gridId, onMovieClick, myList, onAddToMyList,
   </div>
 );
 
-export default function NetflixMovieBrowser() {
+export default function StreamFlixMovieBrowser() {
   const [movies, setMovies] = useState([]);
   const [trending, setTrending] = useState([]);
   const [topRated, setTopRated] = useState([]);
@@ -197,6 +198,13 @@ export default function NetflixMovieBrowser() {
   const [playingVideo, setPlayingVideo] = useState(null);
   const [showAd, setShowAd] = useState(false);
 const [pendingVideo, setPendingVideo] = useState(null);
+
+  const activeProfileLabel = (() => {
+    const profiles = currentUser?.profiles || [];
+    const active = profiles.find((p) => p.isDefault) || profiles[0];
+    if (!active) return "PERSONAL";
+    return String(active.type || active.name || "personal").toUpperCase();
+  })();
 
   // Replace with your actual TMDB API key
   const TMDB_API_KEY = "48ed6cdf6b400404f38c7a47b5cf6bca";
@@ -557,51 +565,57 @@ const handleAdFinished = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-16">
-      {/* Netflix-style Header */}
-      {/* Netflix Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md">
+    <div className="min-h-screen bg-[#0b0b0f] pt-16 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#1a1a2e,#0b0b0f_60%)]" />
+        <div className="orb orb-a" />
+        <div className="orb orb-b" />
+        <div className="orb orb-c" />
+        <div className="grid-glow" />
+      </div>
+      {/* StreamFlix-style Header */}
+      {/* StreamFlix Navbar */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/10">
         <div className="flex items-center justify-between px-4 md:px-12 h-16">
           {/* LEFT */}
           <div className="flex items-center space-x-8">
-            <h1 className="text-red-600 text-2xl font-bold tracking-wide cursor-pointer">
-              NETFLIX
-            </h1>
+            <StreamFlixLogo className="h-[6rem] w-auto cursor-pointer" />
 
             <nav className="hidden md:flex items-center space-x-5 text-sm text-gray-200">
               <span
                 onClick={() => handleNavigation("home")}
-                className={`cursor-pointer transition-colors ${activeNav === "home" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "home" ? "nav-pill-active" : ""}`}
               >
                 Home
               </span>
               <span
                 onClick={() => handleNavigation("tv")}
-                className={`cursor-pointer transition-colors ${activeNav === "tv" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "tv" ? "nav-pill-active" : ""}`}
               >
                 TV Shows
               </span>
               <span
                 onClick={() => handleNavigation("movies")}
-                className={`cursor-pointer transition-colors ${activeNav === "movies" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "movies" ? "nav-pill-active" : ""}`}
               >
                 Movies
               </span>
               <span
                 onClick={() => handleNavigation("latest")}
-                className={`cursor-pointer transition-colors ${activeNav === "latest" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "latest" ? "nav-pill-active" : ""}`}
               >
                 Latest
               </span>
               <span
                 onClick={() => handleNavigation("custom")}
-                className={`cursor-pointer transition-colors ${activeNav === "custom" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "custom" ? "nav-pill-active" : ""}`}
               >
                 My Videos {customVideos.length > 0 && `(${customVideos.length})`}
               </span>
               <span
                 onClick={() => handleNavigation("mylist")}
-                className={`cursor-pointer transition-colors ${activeNav === "mylist" ? "font-semibold text-white" : "hover:text-gray-400"}`}
+                className={`nav-pill ${activeNav === "mylist" ? "nav-pill-active" : ""}`}
               >
                 My List {myList.length > 0 && `(${myList.length})`}
               </span>
@@ -631,9 +645,9 @@ const handleAdFinished = () => {
               </button>
             </div>
 
-            {/* CHILDREN */}
-            <span className="hidden md:block text-sm hover:text-gray-400 cursor-pointer">
-              CHILDREN
+            {/* PERSONAL */}
+            <span className="hidden md:block text-sm hover:text-gray-400 cursor-pointer nav-pill">
+              {activeProfileLabel}
             </span>
 
             {/* BELL */}
@@ -675,9 +689,20 @@ const handleAdFinished = () => {
                       Plan
                     </p>
                     <p className="text-white text-sm font-semibold capitalize">
-                      {currentUser?.plan || "Free"}
+                      {currentUser?.subscriptionPlan || currentUser?.plan || "Free"}
                     </p>
                   </div>
+
+                  {/* Account Link */}
+                  <button
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      window.location.href = "/account";
+                    }}
+                    className="w-full text-left px-4 py-3 text-white hover:bg-gray-900 transition text-sm font-medium"
+                  >
+                    Account
+                  </button>
 
                   {/* Logout Button */}
                   <button
@@ -761,7 +786,7 @@ const handleAdFinished = () => {
               />
             )}
             <MovieRow
-              title="Popular on Netflix"
+              title="Popular on StreamFlix"
               movies={movies}
               rowId="popular"
               onMovieClick={handleMovieClick}
@@ -903,7 +928,6 @@ const handleAdFinished = () => {
       {playingVideo && (
   <VideoWithAds
     videoSrc={playingVideo.videoUrl}
-    isPremium={currentUser?.plan === "premium"}
     onClose={() => setPlayingVideo(null)}
     title={playingVideo.title}
   />
@@ -914,7 +938,70 @@ const handleAdFinished = () => {
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
+        .orb {
+          position: absolute;
+          width: 420px;
+          height: 420px;
+          border-radius: 999px;
+          filter: blur(40px);
+          opacity: 0.35;
+          animation: float 10s ease-in-out infinite;
+        }
+        .orb-a {
+          background: radial-gradient(circle, rgba(229,9,20,0.6), transparent 60%);
+          top: -140px;
+          left: -120px;
+        }
+        .orb-b {
+          background: radial-gradient(circle, rgba(79,70,229,0.5), transparent 60%);
+          bottom: -160px;
+          right: -80px;
+          animation-delay: 1.5s;
+        }
+        .orb-c {
+          background: radial-gradient(circle, rgba(16,185,129,0.4), transparent 60%);
+          top: 40%;
+          left: 60%;
+          animation-delay: 3s;
+        }
+        .grid-glow {
+          position: absolute;
+          inset: 0;
+          background-image: linear-gradient(transparent 95%, rgba(255,255,255,0.04) 96%),
+            linear-gradient(90deg, transparent 95%, rgba(255,255,255,0.04) 96%);
+          background-size: 50px 50px;
+          opacity: 0.25;
+          transform: perspective(800px) rotateX(65deg) translateY(120px);
+        }
+        .nav-pill {
+          padding: 6px 12px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          transition: all 200ms ease;
+          cursor: pointer;
+        }
+        .nav-pill:hover {
+          border-color: rgba(255,255,255,0.2);
+          background: rgba(255,255,255,0.06);
+        }
+        .nav-pill-active {
+          border-color: rgba(229,9,20,0.7);
+          background: rgba(229,9,20,0.15);
+          color: #fff;
+          font-weight: 600;
+        }
+        .movie-card {
+          perspective: 1200px;
+        }
+        .movie-card:hover {
+          transform: translateY(-4px) rotateX(3deg) rotateY(-4deg);
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-18px); }
+        }
       `}</style>
     </div>
   );
 }
+

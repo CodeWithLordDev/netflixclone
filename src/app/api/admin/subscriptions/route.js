@@ -91,8 +91,12 @@ export async function POST(request) {
     );
 
     const startDate = new Date();
-    const expiryDate = new Date();
-    expiryDate.setMonth(expiryDate.getMonth() + Number(billingPeriodMonths || 1));
+    const expiryDate = new Date(startDate);
+    expiryDate.setDate(expiryDate.getDate() + Number(plan.duration || 0));
+
+    const normalizedPlanName = String(plan.name || "").trim().toLowerCase();
+    const isFreePlan = Number(plan.price || 0) <= 0 || normalizedPlanName === "free" || normalizedPlanName === "free plan";
+    const userPlan = isFreePlan ? "free" : "premium";
 
     const subscription = await Subscription.create({
       userId,
@@ -101,10 +105,27 @@ export async function POST(request) {
       expiryDate,
       isActive: true,
       amount: amount || plan.price,
-      currency: "USD",
+      currency: "INR",
       paymentStatus: "paid",
       autoRenew: true,
     });
+
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          plan: userPlan,
+          subscriptionPlan: plan.name,
+          subscriptionStatus: "active",
+          subscriptionStartDate: startDate,
+          subscriptionEndDate: expiryDate,
+          billingCycle: plan.billingCycle || "",
+          price: plan.price,
+          subscriptionExpiresAt: expiryDate,
+        },
+      },
+      { new: true }
+    );
 
     await logAudit({
       actorId: gate.session.user.id,

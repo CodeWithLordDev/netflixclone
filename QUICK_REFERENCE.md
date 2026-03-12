@@ -2,7 +2,7 @@
 
 ## What's Been Built
 
-A **production-ready admin system** for Netflix Clone with 3 specialized dashboards, enterprise-grade security, comprehensive API routes, and full documentation.
+A **production-ready admin system** for StreamFlix Clone with 3 specialized dashboards, enterprise-grade security, comprehensive API routes, and full documentation.
 
 ---
 

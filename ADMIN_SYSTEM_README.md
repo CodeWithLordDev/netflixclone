@@ -1,4 +1,4 @@
-# 🎬 Netflix Clone - Admin System
+# 🎬 StreamFlix Clone - Admin System
 
 A production-ready admin dashboard system with 3 specialized dashboards, built with Next.js 16, MongoDB, JWT authentication, and Tailwind CSS.
 
@@ -405,7 +405,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 
 ## 📄 License
 
-Netflix Clone - Admin System © 2024
+StreamFlix Clone - Admin System © 2024
 
 ## 🤝 Contributing
 

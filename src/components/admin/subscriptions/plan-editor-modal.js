@@ -58,7 +58,7 @@ export default function PlanEditorModal({ open, onClose, initialData, onSubmit }
         <div className="grid grid-cols-2 gap-2">
           <Input
             type="number"
-            placeholder="Price in USD"
+            placeholder="Price in INR"
             value={form.price}
             onChange={(event) => setForm((p) => ({ ...p, price: event.target.value }))}
           />

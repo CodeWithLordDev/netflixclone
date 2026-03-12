@@ -39,7 +39,9 @@ export default function UsersTable({
         <tr key={resolveId(row) || row.email} className="border-b border-[var(--dash-border)] transition hover:bg-white/[0.03]">
           <td className="px-4 py-3 font-mono text-xs text-[var(--dash-muted)]">{resolveId(row)}</td>
           <td className="px-4 py-3">
-            <p className="font-medium text-[var(--dash-text)]">{row.name || "-"}</p>
+            <p className="font-medium text-[var(--dash-text)]">
+              {row.name || `${row.firstName || ""} ${row.lastName || ""}`.trim() || "-"}
+            </p>
             <p className="text-xs text-[var(--dash-muted)]">{row.email}</p>
           </td>
           <td className="px-4 py-3 text-[var(--dash-text)]">
