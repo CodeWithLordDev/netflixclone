@@ -17,7 +17,7 @@ export async function GET(req) {
 
     await connectDB();
     const user = await User.findById(decoded.id)
-      .select("name email role plan subscriptionPlan subscriptionStatus subscriptionStartDate subscriptionEndDate billingCycle price subscriptionExpiresAt isActive isBanned createdAt profiles");
+      .select("firstName lastName name email role plan subscriptionPlan subscriptionStatus subscriptionStartDate subscriptionEndDate billingCycle price subscriptionExpiresAt isActive isBanned createdAt profiles");
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });

@@ -53,8 +53,10 @@ export async function PATCH(request, { params }) {
       const title = formData.get("title");
       const durationRaw = formData.get("duration");
       const statusRaw = formData.get("status");
+      const targetPlanRaw = formData.get("targetPlan");
       const revenueRaw = formData.get("revenuePerView");
       const videoFile = formData.get("video");
+      const imageUrlRaw = formData.get("imageUrl");
 
       if (title) update.title = String(title);
       if (durationRaw !== null) {
@@ -68,12 +70,21 @@ export async function PATCH(request, { params }) {
         const normalized = String(statusRaw).toLowerCase() === "inactive" ? "inactive" : "active";
         update.status = normalized;
       }
+      if (targetPlanRaw) {
+        const normalizedPlan = String(targetPlanRaw).toLowerCase();
+        update.targetPlan = ["free", "basic", "all"].includes(normalizedPlan)
+          ? normalizedPlan
+          : "free";
+      }
       if (revenueRaw !== null) {
         const revenuePerView = Number(revenueRaw);
         if (!Number.isFinite(revenuePerView) || revenuePerView < 0) {
           return fail("VALIDATION_ERROR", "Invalid revenue per view", 400);
         }
         update.revenuePerView = revenuePerView;
+      }
+      if (imageUrlRaw !== null) {
+        update.imageUrl = String(imageUrlRaw || "");
       }
 
       const ad = await Ad.findById(id).lean();
@@ -86,8 +97,6 @@ export async function PATCH(request, { params }) {
         const videoName = await saveFile(videoFile, adsDir, base);
         update.videoUrl = `/ads/${videoName}`;
       }
-
-      update.targetPlan = "free";
 
       const updated = await Ad.findByIdAndUpdate(id, { $set: update }, { new: true }).lean();
       if (!updated) return fail("AD_NOT_FOUND", "Ad not found", 404);
@@ -106,10 +115,7 @@ export async function PATCH(request, { params }) {
     const ad = await Ad.findByIdAndUpdate(
       id,
       {
-        $set: {
-          ...parsed.data,
-          targetPlan: "free",
-        },
+        $set: parsed.data,
       },
       { new: true }
     );

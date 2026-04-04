@@ -80,6 +80,16 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    resetOtp: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+      select: false,
+    },
     activeSessions: [
       {
         deviceId: {

@@ -42,11 +42,15 @@ export const notifySchema = z.object({
 
 export const adSchema = z.object({
   title: z.string().min(2).max(160),
-  videoUrl: z.string().url(),
+  videoUrl: z.string().url().optional().or(z.literal("")),
+  imageUrl: z.string().url().optional().or(z.literal("")),
   duration: z.number().int().positive(),
   status: z.enum(["active", "inactive"]).default("active"),
-  targetPlan: z.enum(["free"]).default("free"),
+  targetPlan: z.enum(["free", "basic", "all"]).default("free"),
   revenuePerView: z.number().min(0).default(0),
+}).refine((value) => Boolean(value.videoUrl || value.imageUrl), {
+  message: "Either a videoUrl or imageUrl is required",
+  path: ["videoUrl"],
 });
 
 export const subscriptionPlanSchema = z.object({

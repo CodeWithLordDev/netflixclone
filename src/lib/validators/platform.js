@@ -12,6 +12,21 @@ export const loginSchema = z.object({
   password: z.string().min(8)
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const verifyOtpSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().regex(/^\d{6}$/),
+});
+
+export const resetPasswordSchema = z.object({
+  email: z.string().email(),
+  otp: z.string().regex(/^\d{6}$/),
+  password: z.string().min(8),
+});
+
 export const planSchema = z.object({
   name: z.string().min(2),
   price: z.number().nonnegative(),

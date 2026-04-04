@@ -258,6 +258,9 @@ const [pendingVideo, setPendingVideo] = useState(null);
       if (response.ok) {
         const user = await response.json();
         setCurrentUser(user);
+        try {
+          localStorage.setItem("streamflix-auth-user", JSON.stringify(user));
+        } catch {}
       }
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -267,6 +270,9 @@ const [pendingVideo, setPendingVideo] = useState(null);
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      try {
+        localStorage.removeItem("streamflix-auth-user");
+      } catch {}
       window.location.href = "/signin";
     } catch (error) {
       console.error("Error logging out:", error);
@@ -299,9 +305,10 @@ const [pendingVideo, setPendingVideo] = useState(null);
     setUpcoming(upcomingMovies);
     setCustomVideos(customVids || []);
     
-    // Set a random featured movie on each refresh
-    const randomIndex = Math.floor(Math.random() * popularMovies.length);
-    setFeatured(popularMovies[randomIndex]);
+    const featuredIndex = popularMovies.length
+      ? popularMovies.reduce((sum, movie) => sum + Number(movie?.id || 0), 0) % popularMovies.length
+      : 0;
+    setFeatured(popularMovies[featuredIndex] || null);
     setLoading(false);
   };
 

@@ -138,10 +138,12 @@ export async function POST(request) {
       const title = formData.get("title");
       const duration = Number(formData.get("duration"));
       const statusRaw = String(formData.get("status") || "active").toLowerCase();
+      const targetPlanRaw = String(formData.get("targetPlan") || "free").toLowerCase();
       const revenuePerView = Number(formData.get("revenuePerView") || 0);
       const videoFile = formData.get("video");
+      const imageUrl = String(formData.get("imageUrl") || "");
 
-      if (!title || !videoFile) {
+      if (!title || (!videoFile && !imageUrl)) {
         return fail("VALIDATION_ERROR", "Missing required fields", 400);
       }
       if (!Number.isFinite(duration) || duration <= 0) {
@@ -152,19 +154,27 @@ export async function POST(request) {
       }
 
       const status = statusRaw === "inactive" ? "inactive" : "active";
+      const targetPlan = ["free", "basic", "all"].includes(targetPlanRaw)
+        ? targetPlanRaw
+        : "free";
 
-      const adsDir = path.join(process.cwd(), "public", "ads");
-      await fs.mkdir(adsDir, { recursive: true });
-      const base = slugify(title) || "ad";
-      const videoName = await saveFile(videoFile, adsDir, base);
+      let videoUrl = "";
+      if (videoFile) {
+        const adsDir = path.join(process.cwd(), "public", "ads");
+        await fs.mkdir(adsDir, { recursive: true });
+        const base = slugify(title) || "ad";
+        const videoName = await saveFile(videoFile, adsDir, base);
+        videoUrl = `/ads/${videoName}`;
+      }
 
       await connectDB();
       const ad = await Ad.create({
         title: String(title),
-        videoUrl: `/ads/${videoName}`,
+        videoUrl,
+        imageUrl,
         duration,
         status,
-        targetPlan: "free",
+        targetPlan,
         revenuePerView,
         totalViews: 0,
       });
@@ -181,7 +191,7 @@ export async function POST(request) {
     const ad = await Ad.create({
       ...parsed.data,
       status: parsed.data.status || "active",
-      targetPlan: "free",
+      targetPlan: parsed.data.targetPlan || "free",
       totalViews: 0,
     });
 

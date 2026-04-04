@@ -4,10 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { getOrCreateDeviceId } from "@/lib/deviceId";
 import StreamFlixLogo from "../components/StreamFlixLogo";
+import { useAuth } from "@/context/auth-context";
 
 export default function SigninClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +66,7 @@ export default function SigninClient() {
       const data = await res.json();
 
       if (res.ok) {
+        await refreshUser();
         router.push(data.redirectTo || "/browse");
       } else if (res.status === 404) {
         router.push("/signup");
@@ -186,6 +189,13 @@ export default function SigninClient() {
                 Need help?
               </a>
             </div>
+            <button
+              type="button"
+              onClick={() => router.push("/forgot-password")}
+              className="mt-3 text-sm text-red-300 transition hover:text-red-200"
+            >
+              Forgot Password?
+            </button>
 
             <div className="mt-12 text-white/70 text-base">
               New to StreamFlix?{" "}
